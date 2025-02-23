@@ -1,0 +1,48 @@
+<div class="login-container">
+  <mat-card class="example-card" appearance="outlined" style="width: 320px">
+    <h1>Welcome</h1>
+    <form [formGroup]="loginForm" (ngSubmit)="submit(loginForm)" class="mt-4">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Enter your email</mat-label>
+        <input
+          matInput
+          placeholder="pat@example.com"
+          [formControl]="emailFC"
+          (blur)="updateErrorMessage()"
+          required
+        />
+        @if (emailFC.invalid) {
+        <mat-error>{{ errorMessage() }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Enter your password</mat-label>
+        <input
+          [formControl]="passwordFC"
+          matInput
+          [type]="hide() ? 'password' : 'text'"
+        />
+        <button
+          mat-icon-button
+          type="button"
+          matSuffix
+          (click)="clickEvent($event)"
+          [attr.aria-label]="'Hide password'"
+          [attr.aria-pressed]="hide()"
+        >
+          <mat-icon>{{ hide() ? "visibility_off" : "visibility" }}</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <button
+        color="primary"
+        class="full-width"
+        mat-raised-button
+        type="submit"
+      >
+        Login
+      </button>
+    </form>
+  </mat-card>
+</div>
