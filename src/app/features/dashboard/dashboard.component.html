@@ -1,1 +1,79 @@
-<p>dashboard works!</p>
+<mat-card appearance="outlined" class="mat-elevation-z8 p-0 d-none d-sm-block">
+  <mat-table
+    class=""
+    [dataSource]="dataSource"
+    matSort
+    matSortActive="dateFrom"
+    matSortDirection="asc"
+    matSortDisableClear
+  >
+    <ng-container matColumnDef="name">
+      <mat-header-cell
+        class=""
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        >name</mat-header-cell
+      >
+      <mat-cell mat-cell *matCellDef="let row">
+        <span>{{ row.name }}</span>
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <mat-header-cell
+        class=""
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        >status</mat-header-cell
+      >
+      <mat-cell mat-cell *matCellDef="let row">
+        <span>{{ row.status }}</span>
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="createdAt">
+      <mat-header-cell
+        class=""
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        >createdAt</mat-header-cell
+      >
+      <mat-cell mat-cell *matCellDef="let row">
+        <span>{{ row.createdAt }}</span>
+      </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="updatedAt">
+      <mat-header-cell
+        class=""
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        >updatedAt</mat-header-cell
+      >
+      <mat-cell mat-cell *matCellDef="let row">
+        <span>{{ row.updatedAt }}</span>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row
+      *matHeaderRowDef="displayedColumns; sticky: true"
+    ></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns"> </mat-row>
+  </mat-table>
+
+  <!-- <app-loader
+    class="approve-loader"
+    *ngIf="isLoadingApproveManyVacations"
+  ></app-loader> -->
+
+  <mat-paginator
+    [length]="resultsLength"
+    [pageIndex]="paginatorPage"
+    [pageSize]="paginatorPageSize"
+    [pageSizeOptions]="[5, 10, 20]"
+  >
+  </mat-paginator>
+</mat-card>

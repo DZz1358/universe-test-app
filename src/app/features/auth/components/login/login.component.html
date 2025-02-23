@@ -1,6 +1,6 @@
 <div class="login-container">
-  <mat-card class="example-card" appearance="outlined" style="width: 320px">
-    <h1>Welcome</h1>
+  <mat-card class="" appearance="outlined">
+    <h1>Sign In</h1>
     <form [formGroup]="loginForm" (ngSubmit)="submit(loginForm)" class="mt-4">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Enter your email</mat-label>
@@ -40,9 +40,21 @@
         class="full-width"
         mat-raised-button
         type="submit"
+        [disabled]="loginForm.invalid"
       >
         Login
       </button>
     </form>
+
+    <div class="sign-up-wrapper">
+      <span class="text-signup">If you don't have account. You can</span>
+      <a
+        class="link-auth-text"
+        rel="stylesheet"
+        [routerLink]="['/registration']"
+      >
+        Sign Up
+      </a>
+    </div>
   </mat-card>
 </div>

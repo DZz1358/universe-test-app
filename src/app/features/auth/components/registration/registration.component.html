@@ -1,1 +1,83 @@
-<p>registration works!</p>
+<div class="login-container">
+  <mat-card appearance="outlined">
+    <h1>Sign Up</h1>
+    <form
+      [formGroup]="registerForm"
+      (ngSubmit)="submit(registerForm)"
+      class="mt-4"
+    >
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Enter your fullName</mat-label>
+        <input
+          matInput
+          placeholder="pat@example.com"
+          [formControl]="fullNameFC"
+          (blur)="updateErrorMessage()"
+          required
+        />
+        @if (fullNameFC.invalid) {
+        <mat-error>{{ errorMessage() }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Enter your email</mat-label>
+        <input
+          matInput
+          placeholder="pat@example.com"
+          [formControl]="emailFC"
+          (blur)="updateErrorMessage()"
+          required
+        />
+        @if (emailFC.invalid) {
+        <mat-error>{{ errorMessage() }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Enter your password</mat-label>
+        <input
+          [formControl]="passwordFC"
+          matInput
+          [type]="hide() ? 'password' : 'text'"
+        />
+        <button
+          mat-icon-button
+          type="button"
+          matSuffix
+          (click)="clickEvent($event)"
+          [attr.aria-label]="'Hide password'"
+          [attr.aria-pressed]="hide()"
+        >
+          <mat-icon>{{ hide() ? "visibility_off" : "visibility" }}</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Choose status</mat-label>
+        <mat-select [formControl]="statusFC">
+          @for (status of statuses; track status) {
+          <mat-option [value]="status.value">{{ status.viewValue }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <button
+        color="primary"
+        class="full-width"
+        mat-raised-button
+        type="submit"
+        [disabled]="registerForm.invalid"
+      >
+        Registration
+      </button>
+    </form>
+
+    <div class="sign-up-wrapper">
+      <span class="text-signup">If you have account. You can</span>
+      <a class="link-auth-text" rel="stylesheet" [routerLink]="['/login']">
+        Sign In
+      </a>
+    </div>
+  </mat-card>
+</div>

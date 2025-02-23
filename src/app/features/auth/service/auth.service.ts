@@ -12,10 +12,7 @@ export class AuthService {
 
 
   login(data: any) {
-    console.log('data', data);
-    return this.http.post(`${environment.apiUrl}/auth/login`, data).subscribe(response => {
-      console.log('Login response:', response);
-    });;
+    return this.http.post(`${environment.apiUrl}/auth/login`, data);
   }
 
   registration(data: any) {

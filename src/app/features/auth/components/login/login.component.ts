@@ -8,7 +8,7 @@ import { MatCardModule } from '@angular/material/card';
 import { AuthService } from '../../service/auth.service';
 import { Subject, takeUntil } from 'rxjs';
 import { StorageService } from '../../../../service/storage.service';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -16,7 +16,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./login.component.scss'],
   standalone: true,
   imports: [FormsModule, ReactiveFormsModule, MatFormFieldModule,
-    MatInputModule, MatIconModule, MatButtonModule, MatCardModule],
+    MatInputModule, MatIconModule, MatButtonModule, MatCardModule, RouterModule],
 })
 export class LoginComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -34,7 +34,6 @@ export class LoginComponent implements OnInit {
   get passwordFC(): FormControl {
     return this.loginForm.get('password') as FormControl;
   }
-
 
   public loginForm: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -65,46 +64,20 @@ export class LoginComponent implements OnInit {
     const data = loginForm.value;
     console.log('data', data);
     this.authService.login(data)
-    // .pipe(takeUntil(this.destroy$))
-    // .subscribe({
-    //   next: (response: any) => {
-    //     console.log('response', response);
-    //     console.log('response', typeof response);
-    //     this.storageService.setToken(response.access_token);
-    //     // this.isLoading = false;
-    //     this.router.navigate(['/dashboard']);
-    //   },
-    //   error: err => {
-    //     // this.isLoading = false;
-    //     this.errorMessage = err.message;
-    //   },
-    // });
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: any) => {
+          this.storageService.setToLocalStore('access_token', response.access_token);
+          // this.isLoading = false;
+          this.router.navigate(['/dashboard']);
+        },
+        error: err => {
+          // this.isLoading = false;
+          this.errorMessage = err.message;
+        },
+      });
   }
 
-  // onLogin() {
-  //   if (this.loginForm.valid) {
-  //     this.isLoading = true;
-  //     this.errorMessage = '';
-
-  //     const { email, password } = this.loginForm.value;
-
-  //     this.authService.login(email, password)
-  //     .pipe(takeUntil(this.destroy$))
-  //     .subscribe({
-  //       next: response => {
-  //         this.isLoading = false;
-  //         this.storageService.setToStorage('authToken', response.authenticationToken);
-  //         this.storageService.setToStorage('user', response.user);
-  //         this.router.navigate(['/dashboard']);
-  //       },
-  //       error: err => {
-  //         this.isLoading = false;
-  //         this.errorMessage = err.message;
-  //         this.presentToast(err.message);
-  //       },
-  //     });
-  //   }
-  // }
 
 
 }

@@ -3,18 +3,14 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { StorageService } from '../../service/storage.service';
 
-export const AuthInterceptor: HttpInterceptorFn = (
+export const authInterceptor: HttpInterceptorFn = (
   req: HttpRequest<any>,
   next: HttpHandlerFn
 ): Observable<HttpEvent<any>> => {
   const storageService = inject(StorageService);
-  const authToken = storageService.getToken();
-
-  console.log('Intercepted request to:', req.url);
-  console.log('Token before request:', authToken);
+  const authToken = storageService.getFromLocalStore('access_token');
 
   if (!authToken) {
-    console.log('No token, sending request without Authorization header.');
     return next(req);
   }
 
