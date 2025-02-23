@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authTokenGuard } from './shared/guards/auth-token.guard';
 
 export const routes: Routes = [
   {
@@ -14,7 +15,7 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     loadComponent: () => import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent),
-    canActivate: [],
+    canActivate: [authTokenGuard],
   },
   {
     path: '',
