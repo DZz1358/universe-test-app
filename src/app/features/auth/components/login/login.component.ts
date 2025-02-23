@@ -7,7 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { AuthService } from '../../service/auth.service';
 import { Subject, takeUntil } from 'rxjs';
-import { StorageService } from '../../../../service/storage.service';
+import { StorageService } from '../../../../shared/service/storage.service';
 import { Router, RouterModule } from '@angular/router';
 
 @Component({
@@ -62,7 +62,6 @@ export class LoginComponent implements OnInit {
 
   submit(loginForm: any) {
     const data = loginForm.value;
-    console.log('data', data);
     this.authService.login(data)
       .pipe(takeUntil(this.destroy$))
       .subscribe({

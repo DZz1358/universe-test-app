@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { StorageService } from '../../../../service/storage.service';
+import { StorageService } from '../../../../shared/service/storage.service';
 import { AuthService } from '../../service/auth.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
@@ -76,7 +76,6 @@ export class RegistrationComponent {
 
   submit(registerForm: any) {
     const data = registerForm.value;
-    console.log('data', data);
     this.authService.registration(data)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
