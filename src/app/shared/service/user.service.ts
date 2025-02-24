@@ -13,4 +13,8 @@ export class UserService {
   getUser() {
     return this.http.get(`${environment.apiUrl}/user`);
   }
+
+  getUsersList() {
+    return this.http.get(`${environment.apiUrl}/user/users?page=1&size=100`);
+  }
 }
