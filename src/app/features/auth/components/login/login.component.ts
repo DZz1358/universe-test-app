@@ -6,7 +6,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { AuthService } from '../../service/auth.service';
-import { Subject, takeUntil } from 'rxjs';
 import { StorageService } from '../../../../shared/service/storage.service';
 import { Router, RouterModule } from '@angular/router';
 
@@ -18,12 +17,11 @@ import { Router, RouterModule } from '@angular/router';
   imports: [FormsModule, ReactiveFormsModule, MatFormFieldModule,
     MatInputModule, MatIconModule, MatButtonModule, MatCardModule, RouterModule],
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
   private fb = inject(FormBuilder);
   authService = inject(AuthService);
   router = inject(Router);
   storageService = inject(StorageService);
-  private destroy$ = new Subject<void>();
   errorMessage = signal('');
   hide = signal(true);
 
@@ -39,11 +37,6 @@ export class LoginComponent implements OnInit {
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required]],
   });
-
-
-  ngOnInit(): void {
-  }
-
 
   updateErrorMessage() {
     if (this.emailFC.hasError('required')) {
@@ -63,15 +56,13 @@ export class LoginComponent implements OnInit {
   submit(loginForm: any) {
     const data = loginForm.value;
     this.authService.login(data)
-      .pipe(takeUntil(this.destroy$))
+
       .subscribe({
         next: (response: any) => {
           this.storageService.setToLocalStore('access_token', response.access_token);
-          // this.isLoading = false;
           this.router.navigate(['/dashboard']);
         },
         error: err => {
-          // this.isLoading = false;
           this.errorMessage = err.message;
         },
       });

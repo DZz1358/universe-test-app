@@ -1,5 +1,5 @@
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AfterViewInit, Component, inject, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, DestroyRef, inject, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -16,9 +16,8 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSelectModule } from '@angular/material/select';
 import { DatePipe, NgFor, NgForOf, NgIf } from '@angular/common';
 import { documentStatuses } from '../../shared/const/document-status.const';
-import { RoleCheckDirective } from '../../shared/directives/role-check.directive';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { Subject } from 'rxjs';
 
 interface IUser {
   email: string,
@@ -42,32 +41,30 @@ interface IResponse {
 @Component({
   selector: 'app-dashboard',
   imports: [FormsModule, ReactiveFormsModule, MatFormFieldModule,
-    MatInputModule, MatIconModule, MatButtonModule, NgIf, NgForOf, MatAutocompleteModule, MatCardModule, MatTableModule, MatPaginatorModule, MatSortModule, HeaderComponent, MatSelectModule, DatePipe],
+    MatInputModule, MatIconModule, MatButtonModule, MatAutocompleteModule, MatCardModule, MatTableModule, MatPaginatorModule, MatSortModule, HeaderComponent, MatSelectModule, DatePipe],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
-  standalone: true
+  // standalone: true  удалить
 })
-export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
-  userService = inject(UserService);
-  documentsService = inject(DocumentsService);
-  storageService = inject(StorageService);
-  router = inject(Router);
+export class DashboardComponent implements OnInit, AfterViewInit {
+  private userService = inject(UserService);
+  private documentsService = inject(DocumentsService);
+  private storageService = inject(StorageService);
+  private router = inject(Router);
   private fb = inject(FormBuilder);
-
 
   public statusesDocuments = signal(documentStatuses);
   public filteredUsers = signal<IUser[]>([]);
-  currentUser = signal<any>(null);
-  private destroy$ = new Subject<void>();
+  public currentUser = signal<IUser | null>(null);
+  destroyRef = inject(DestroyRef);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-
   public dataSource = new MatTableDataSource([]);
   public displayedColumns = ['name', 'creator', 'status', 'updatedAt', 'settings'];
-  public resultsLength = 0;
-  public paginatorPage = 1;
+  public resultsLength = signal(0);
+  public paginatorPage = 0;
   public paginatorPageSize = 10;
 
   get creatorEmailFC(): FormControl {
@@ -82,7 +79,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   get isReviewerUser(): boolean {
-    return this.currentUser().role === 'REVIEWER';
+    return this.currentUser()?.role === 'REVIEWER';
   }
 
   public form: FormGroup = this.fb.group({
@@ -94,42 +91,48 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.getDocumentsFilter(false);
 
-    this.userService.getUser().subscribe((data: any) => {
-      this.currentUser.set(data);
-      this.storageService.setToLocalStore('user', data);
+    this.userService.getUser()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: any) => {
+        this.currentUser.set(data);
+        this.storageService.setToLocalStore('user', data);
 
-      if (this.isReviewerUser) {
-        this.statusesDocuments.set(this.statusesDocuments().filter(status => status.value !== 'DRAFT'));
-        this.userService.getUsersList().subscribe((users: any) => {
-          this.filteredUsers.set(users.results);
-        });
-      } else {
-        this.displayedColumns = this.displayedColumns.filter(column => column !== 'creator');
-      }
-    });
-
-    this.form.valueChanges.subscribe((data) => {
-      this.getDocumentsFilter(true);
-    });
+        if (this.isReviewerUser) {
+          this.statusesDocuments.set(this.statusesDocuments().filter(status => status.value !== 'DRAFT'));
+          this.getUsersList();
+        } else {
+          this.displayedColumns = this.displayedColumns.filter(column => column !== 'creator');
+        }
+      });
+    this.changeForm();
   }
 
+  changeForm() {
+    this.form.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.getDocumentsFilter(true));
+  }
 
+  getUsersList() {
+    this.userService.getUsersList()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((users: any) => {
+        this.filteredUsers.set(users.results);
+      });
+
+  }
 
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
 
-    // this.paginator.page.subscribe((event: PageEvent) => {
-    //   console.log('Пагинация изменилась:', event);
-    //   this.resultsLength = event.length;
-    //   this.paginatorPage = event.pageIndex;
-    //   this.paginatorPageSize = event.pageSize;
-    //   this.getDocumentsFilter();
-    // });
+    this.paginator.page.subscribe((event: PageEvent) => {
+      this.paginatorPage = event.pageIndex;
+      this.paginatorPageSize = event.pageSize;
+      this.getDocumentsFilter();
+    });
   }
 
-
-  public getDocumentsFilter(formChanges = false) {
+  getDocumentsFilter(formChanges = false) {
     let params: any = {
       page: this.paginator?.pageIndex !== undefined ? this.paginator.pageIndex + 1 : 1,
       size: this.paginatorPageSize,
@@ -144,34 +147,21 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       };
     }
 
-    this.documentsService.getDocuments(params).subscribe((data: any) => {
-      this.dataSource.data = data.results;
-      this.paginatorPage = this.paginator.pageIndex;
-      this.resultsLength = data.count;
-
-    });
+    this.documentsService.getDocuments(params)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: any) => {
+        this.dataSource.data = data.results;
+        this.paginatorPage = this.paginator.pageIndex;
+        this.resultsLength.set(data.count);
+      });
   }
 
-  handlePageEvent(e: PageEvent) {
-    console.log('e', e)
-    // this.pageEvent = e;
-    this.resultsLength = e.length;
-    this.paginatorPageSize = e.pageSize;
-    this.paginatorPage = e.pageIndex;
-  }
-
-  navigateToDocument(id: string) {
+  navigateToDocument(id: string): void {
     this.router.navigate(['/document', id]);
   }
 
-  public displayUserName(user?: any): string {
+  displayUserName(user?: IUser): string {
     return user ? user.fullName : '';
   }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
 
 }

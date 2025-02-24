@@ -17,5 +17,4 @@ export const documentStatuses = [
   {
     value: 'DECLINED', viewValue: 'Declined'
   },
-
 ];
