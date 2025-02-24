@@ -1,7 +1,5 @@
 .card-container {
   margin-bottom: 15px;
-  display: flex;
-  justify-content: flex-end;
   padding: 16px;
   border-bottom: 2px solid rgba(0, 0, 0, 0.1);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -11,4 +9,9 @@
 .button-container {
   display: flex;
   align-items: center;
+  justify-content: end;
+
+  button {
+    margin-right: 15px;
+  }
 }

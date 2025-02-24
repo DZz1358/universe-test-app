@@ -6,7 +6,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { StorageService } from '../../shared/service/storage.service';
-import { DashboardService } from '../../service/dashboard.service';
+import { DocumentsService } from '../../service/documents.service';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { UserService } from '../../shared/service/user.service';
@@ -16,6 +16,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSelectModule } from '@angular/material/select';
 import { DatePipe } from '@angular/common';
 import { documentStatuses } from '../../shared/const/document-status.const';
+import { RoleCheckDirective } from '../../shared/directives/role-check.directive';
 
 interface IUser {
   email: string,
@@ -39,17 +40,18 @@ interface IResponse {
 @Component({
   selector: 'app-dashboard',
   imports: [FormsModule, ReactiveFormsModule, MatFormFieldModule,
-    MatInputModule, MatIconModule, MatButtonModule, MatAutocompleteModule, MatCardModule, MatTableModule, MatPaginatorModule, MatSortModule, HeaderComponent, MatSelectModule, DatePipe],
+    MatInputModule, MatIconModule, RoleCheckDirective, MatButtonModule, MatAutocompleteModule, MatCardModule, MatTableModule, MatPaginatorModule, MatSortModule, HeaderComponent, MatSelectModule, DatePipe],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   standalone: true
 })
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   userService = inject(UserService);
-  dashboardService = inject(DashboardService);
+  DocumentsService = inject(DocumentsService);
   storageService = inject(StorageService);
   public statusesDocuments = documentStatuses;
   public filteredUsers: IUser[] = [];
+  currentUser: any;
 
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -76,6 +78,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.form.get('status') as FormControl;
   }
 
+  isReviewer(user: any): boolean {
+    return user?.role === 'REVIEWER';
+  }
+
   public form: FormGroup = this.fb.group({
     status: [null],
     creatorId: [null],
@@ -84,11 +90,23 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.getDocumentsFilter(false);
+    this.userService.getUser().subscribe((data: any) => {
+      this.currentUser = data;
+      this.storageService.setToLocalStore('user', data);
+    })
 
-    this.userService.getUsersList().subscribe((data: any) => {
-      this.filteredUsers = data.results;
-      console.log('getUsersList data:', data);
-    });
+
+    if (this.isReviewer(this.currentUser)) {
+      this.statusesDocuments = this.statusesDocuments.filter((status) => status.value !== 'DRAFT');
+      this.userService.getUsersList().subscribe((data: any) => {
+        this.filteredUsers = data.results;
+      });
+    }
+
+    if (!this.isReviewer(this.currentUser)) {
+      this.displayedColumns = this.displayedColumns.filter((column) => column !== 'creator');
+    }
+
 
     this.form.valueChanges.subscribe((data) => {
       console.log('data:', data);
@@ -121,11 +139,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         ...Object.fromEntries(
           Object.entries(this.form.value).filter(([_, v]) => v !== null && v !== undefined && v !== '')
         ),
-        creatorId: this.creatorIdFC.value ? this.creatorIdFC.value.id : undefined,
       };
     }
 
-    this.dashboardService.getDocuments(params).subscribe((data: any) => {
+    this.DocumentsService.getDocuments(params).subscribe((data: any) => {
       this.dataSource.data = data.results;
       this.paginatorPage = this.paginator.pageIndex;
       this.resultsLength = data.count;

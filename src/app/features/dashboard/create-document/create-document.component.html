@@ -1,0 +1,51 @@
+<div class="login-container">
+  <div mat-dialog-title class="dialog-header">
+    <h3>Create document</h3>
+
+    <button mat-icon-button (click)="cancel()" aria-label="Close dialog button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <form [formGroup]="form" (ngSubmit)="onSubmit(form)" class="mt-4">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Enter your fullName</mat-label>
+      <input
+        matInput
+        placeholder="Name document"
+        [formControl]="nameFC"
+        required
+      />
+      @if (nameFC.invalid) {
+      <mat-error>You must enter a value</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Choose status</mat-label>
+      <mat-select required [formControl]="statusFC">
+        @for (status of statuses; track status) {
+        <mat-option [value]="status.value">{{ status.viewValue }}</mat-option>
+        }
+      </mat-select>
+      @if (statusFC.invalid) {
+      <mat-error>You must enter a value</mat-error>
+      }
+    </mat-form-field>
+
+    <label>Upload file</label>
+
+    <div class="uploader">
+      <input type="file" (change)="onFileSelected($event)" />
+    </div>
+
+    <button
+      color="primary"
+      class="full-width"
+      mat-raised-button
+      type="submit"
+      [disabled]="form.invalid"
+    >
+      Create document
+    </button>
+  </form>
+</div>

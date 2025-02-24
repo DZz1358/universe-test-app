@@ -1,6 +1,21 @@
 <div class="card-container">
   <div class="button-container">
-    <button (click)="logout()" color="primary" mat-raised-button type="submit">
+    <button
+      *appRoleCheck="['USER']"
+      (click)="addDocument()"
+      color="primary"
+      mat-raised-button
+      type="button"
+    >
+      Add new document
+    </button>
+    <button
+      (click)="logout()"
+      class="logout-btn"
+      color="primary"
+      mat-raised-button
+      type="submit"
+    >
       Log Out
     </button>
   </div>

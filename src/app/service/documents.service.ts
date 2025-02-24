@@ -5,7 +5,7 @@ import { environment } from '../../environments/environment';
 @Injectable({
   providedIn: 'root'
 })
-export class DashboardService {
+export class DocumentsService {
   private http = inject(HttpClient);
   constructor() { }
 
@@ -13,5 +13,15 @@ export class DashboardService {
     return this.http.get(`${environment.apiUrl}/document`, {
       params: data
     });
+  }
+
+  createDocument(data: any) {
+    let formData = new FormData()
+
+    formData.append('name', data.name)
+    formData.append('status', data.status)
+    formData.append('file', data.file)
+
+    return this.http.post(`${environment.apiUrl}/document`, formData)
   }
 }
