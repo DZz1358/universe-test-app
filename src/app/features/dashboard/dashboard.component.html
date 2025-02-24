@@ -4,9 +4,11 @@
   <mat-form-field appearance="outline" class="">
     <mat-label>Choose status</mat-label>
     <mat-select [formControl]="statusFC">
-      @for (status of statusesDocuments; track status) {
-      <mat-option [value]="status.value">{{ status.viewValue }}</mat-option>
-      }
+      <mat-option
+        *ngFor="let status of statusesDocuments()"
+        [value]="status.value"
+        >{{ status.viewValue }}</mat-option
+      >
     </mat-select>
   </mat-form-field>
 
@@ -19,11 +21,9 @@
       [formControl]="creatorIdFC"
     />
     <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayUserName">
-      @for (user of filteredUsers; track $index) {
-      <mat-option [value]="user">
+      <mat-option *ngFor="let user of filteredUsers()" [value]="user">
         {{ user.fullName }}
       </mat-option>
-      }
     </mat-autocomplete>
   </mat-form-field>
 
@@ -97,14 +97,14 @@
         >
         <mat-cell class="setting-column" mat-cell *matCellDef="let row">
           <button
-            *ngIf="!isReviewer(currentUser)"
+            *ngIf="!isReviewerUser"
             mat-icon-button
             (click)="navigateToDocument(row.id)"
           >
             <mat-icon>edit</mat-icon>
           </button>
           <button
-            *ngIf="isReviewer(currentUser)"
+            *ngIf="isReviewerUser"
             mat-icon-button
             (click)="navigateToDocument(row.id)"
           >
@@ -124,6 +124,7 @@
       [pageIndex]="paginatorPage"
       [pageSize]="paginatorPageSize"
       [pageSizeOptions]="[1, 5, 10, 15]"
+      (page)="handlePageEvent($event)"
     >
     </mat-paginator>
   </mat-card>

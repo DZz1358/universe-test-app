@@ -31,7 +31,6 @@ export class DocumentsService {
     })
   }
 
-
   revokeDocument(id: string) {
     return this.http.post(`${environment.apiUrl}/document/${id}/revoke-review`, {})
   }

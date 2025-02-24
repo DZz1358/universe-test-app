@@ -44,7 +44,7 @@
         Update
       </button>
 
-      @if (!isReviewerUser && (document.status === "DRAFT" || document.status
+      @if (!isReviewerUser && (document?.status === "DRAFT" || document?.status
       === "REVOKE")) {
       <button
         color="primary"
@@ -56,7 +56,7 @@
         Delete a document
       </button>
 
-      } @if (!isReviewerUser && document.status === "READY_FOR_REVIEW" ) {
+      } @if (!isReviewerUser && document?.status === "READY_FOR_REVIEW" ) {
 
       <button
         color="primary"

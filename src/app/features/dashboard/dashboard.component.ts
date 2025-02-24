@@ -14,7 +14,7 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSelectModule } from '@angular/material/select';
-import { DatePipe, NgIf } from '@angular/common';
+import { DatePipe, NgFor, NgForOf, NgIf } from '@angular/common';
 import { documentStatuses } from '../../shared/const/document-status.const';
 import { RoleCheckDirective } from '../../shared/directives/role-check.directive';
 import { Router } from '@angular/router';
@@ -42,7 +42,7 @@ interface IResponse {
 @Component({
   selector: 'app-dashboard',
   imports: [FormsModule, ReactiveFormsModule, MatFormFieldModule,
-    MatInputModule, MatIconModule, MatButtonModule, NgIf, MatAutocompleteModule, MatCardModule, MatTableModule, MatPaginatorModule, MatSortModule, HeaderComponent, MatSelectModule, DatePipe],
+    MatInputModule, MatIconModule, MatButtonModule, NgIf, NgForOf, MatAutocompleteModule, MatCardModule, MatTableModule, MatPaginatorModule, MatSortModule, HeaderComponent, MatSelectModule, DatePipe],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   standalone: true
@@ -52,21 +52,20 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   documentsService = inject(DocumentsService);
   storageService = inject(StorageService);
   router = inject(Router);
-  public statusesDocuments = documentStatuses;
-  public filteredUsers: IUser[] = [];
-  currentUser: any;
-  private destroy$ = new Subject<void>();
+  private fb = inject(FormBuilder);
 
+
+  public statusesDocuments = signal(documentStatuses);
+  public filteredUsers = signal<IUser[]>([]);
+  currentUser = signal<any>(null);
+  private destroy$ = new Subject<void>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  private fb = inject(FormBuilder);
 
   public dataSource = new MatTableDataSource([]);
-
   public displayedColumns = ['name', 'creator', 'status', 'updatedAt', 'settings'];
-
   public resultsLength = 0;
   public paginatorPage = 1;
   public paginatorPageSize = 10;
@@ -82,8 +81,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.form.get('status') as FormControl;
   }
 
-  isReviewer(user: any): boolean {
-    return user?.role === 'REVIEWER';
+  get isReviewerUser(): boolean {
+    return this.currentUser().role === 'REVIEWER';
   }
 
   public form: FormGroup = this.fb.group({
@@ -96,13 +95,13 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.getDocumentsFilter(false);
 
     this.userService.getUser().subscribe((data: any) => {
-      this.currentUser = data;
+      this.currentUser.set(data);
       this.storageService.setToLocalStore('user', data);
 
-      if (this.isReviewer(this.currentUser)) {
-        this.statusesDocuments = this.statusesDocuments.filter(status => status.value !== 'DRAFT');
+      if (this.isReviewerUser) {
+        this.statusesDocuments.set(this.statusesDocuments().filter(status => status.value !== 'DRAFT'));
         this.userService.getUsersList().subscribe((users: any) => {
-          this.filteredUsers = users.results;
+          this.filteredUsers.set(users.results);
         });
       } else {
         this.displayedColumns = this.displayedColumns.filter(column => column !== 'creator');
@@ -110,7 +109,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     this.form.valueChanges.subscribe((data) => {
-      console.log('data:', data);
       this.getDocumentsFilter(true);
     });
   }
@@ -121,22 +119,22 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
 
-    this.paginator.page.subscribe((event: PageEvent) => {
-      console.log('Пагинация изменилась:', event);
-      // this.paginatorPage = event.pageIndex;
-      // this.paginatorPageSize = event.pageSize;
-      // this.getDocumentsFilter();
-    });
+    // this.paginator.page.subscribe((event: PageEvent) => {
+    //   console.log('Пагинация изменилась:', event);
+    //   this.resultsLength = event.length;
+    //   this.paginatorPage = event.pageIndex;
+    //   this.paginatorPageSize = event.pageSize;
+    //   this.getDocumentsFilter();
+    // });
   }
 
 
   public getDocumentsFilter(formChanges = false) {
-    console.log('this.paginator', this.paginator)
-
     let params: any = {
       page: this.paginator?.pageIndex !== undefined ? this.paginator.pageIndex + 1 : 1,
       size: this.paginatorPageSize,
     };
+
     if (formChanges) {
       params = {
         ...params,
@@ -152,6 +150,14 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       this.resultsLength = data.count;
 
     });
+  }
+
+  handlePageEvent(e: PageEvent) {
+    console.log('e', e)
+    // this.pageEvent = e;
+    this.resultsLength = e.length;
+    this.paginatorPageSize = e.pageSize;
+    this.paginatorPage = e.pageIndex;
   }
 
   navigateToDocument(id: string) {
