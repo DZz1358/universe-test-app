@@ -14,9 +14,11 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSelectModule } from '@angular/material/select';
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgIf } from '@angular/common';
 import { documentStatuses } from '../../shared/const/document-status.const';
 import { RoleCheckDirective } from '../../shared/directives/role-check.directive';
+import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
 
 interface IUser {
   email: string,
@@ -40,7 +42,7 @@ interface IResponse {
 @Component({
   selector: 'app-dashboard',
   imports: [FormsModule, ReactiveFormsModule, MatFormFieldModule,
-    MatInputModule, MatIconModule, RoleCheckDirective, MatButtonModule, MatAutocompleteModule, MatCardModule, MatTableModule, MatPaginatorModule, MatSortModule, HeaderComponent, MatSelectModule, DatePipe],
+    MatInputModule, MatIconModule, MatButtonModule, NgIf, MatAutocompleteModule, MatCardModule, MatTableModule, MatPaginatorModule, MatSortModule, HeaderComponent, MatSelectModule, DatePipe],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   standalone: true
@@ -49,9 +51,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   userService = inject(UserService);
   DocumentsService = inject(DocumentsService);
   storageService = inject(StorageService);
+  router = inject(Router);
   public statusesDocuments = documentStatuses;
   public filteredUsers: IUser[] = [];
   currentUser: any;
+  private destroy$ = new Subject<void>();
 
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -61,7 +65,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public dataSource = new MatTableDataSource([]);
 
-  public displayedColumns = ['name', 'creator', 'status', 'updatedAt'];
+  public displayedColumns = ['name', 'creator', 'status', 'updatedAt', 'settings'];
 
   public resultsLength = 0;
   public paginatorPage = 1;
@@ -81,7 +85,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   isReviewer(user: any): boolean {
     return user?.role === 'REVIEWER';
   }
-
   public form: FormGroup = this.fb.group({
     status: [null],
     creatorId: [null],
@@ -90,29 +93,29 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.getDocumentsFilter(false);
+
     this.userService.getUser().subscribe((data: any) => {
       this.currentUser = data;
       this.storageService.setToLocalStore('user', data);
-    })
 
-
-    if (this.isReviewer(this.currentUser)) {
-      this.statusesDocuments = this.statusesDocuments.filter((status) => status.value !== 'DRAFT');
-      this.userService.getUsersList().subscribe((data: any) => {
-        this.filteredUsers = data.results;
-      });
-    }
-
-    if (!this.isReviewer(this.currentUser)) {
-      this.displayedColumns = this.displayedColumns.filter((column) => column !== 'creator');
-    }
-
+      if (this.isReviewer(this.currentUser)) {
+        this.statusesDocuments = this.statusesDocuments.filter(status => status.value !== 'DRAFT');
+        this.userService.getUsersList().subscribe((users: any) => {
+          this.filteredUsers = users.results;
+        });
+      } else {
+        this.displayedColumns = this.displayedColumns.filter(column => column !== 'creator');
+      }
+    });
 
     this.form.valueChanges.subscribe((data) => {
       console.log('data:', data);
       this.getDocumentsFilter(true);
-    })
+    });
   }
+
+
+
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
@@ -150,14 +153,17 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-
+  navigateToDocument(id: string) {
+    this.router.navigate(['/document', id]);
+  }
 
   public displayUserName(user?: any): string {
     return user ? user.fullName : '';
   }
 
   ngOnDestroy(): void {
-    // throw new Error('Method not implemented.');
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
 

@@ -58,7 +58,7 @@
           >creator</mat-header-cell
         >
         <mat-cell mat-cell *matCellDef="let row">
-          <span>{{ row.creator.fullName }}</span>
+          <span>{{ row.creator?.fullName }}</span>
         </mat-cell>
       </ng-container>
 
@@ -87,6 +87,31 @@
           <span>{{ row.updatedAt | date : "dd.MM.yyyy HH:mm" }}</span>
         </mat-cell>
       </ng-container>
+
+      <ng-container matColumnDef="settings">
+        <mat-header-cell
+          class="setting-column"
+          mat-header-cell
+          *matHeaderCellDef
+          ><mat-icon>settings</mat-icon></mat-header-cell
+        >
+        <mat-cell class="setting-column" mat-cell *matCellDef="let row">
+          <button
+            *ngIf="!isReviewer(currentUser)"
+            mat-icon-button
+            (click)="navigateToDocument(row.id)"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button
+            *ngIf="isReviewer(currentUser)"
+            mat-icon-button
+            (click)="navigateToDocument(row.id)"
+          >
+            <mat-icon>visibility</mat-icon>
+          </button>
+        </mat-cell></ng-container
+      >
 
       <mat-header-row
         *matHeaderRowDef="displayedColumns; sticky: true"

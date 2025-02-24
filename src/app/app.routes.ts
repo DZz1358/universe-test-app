@@ -18,6 +18,11 @@ export const routes: Routes = [
     canActivate: [authTokenGuard],
   },
   {
+    path: 'document/:id',
+    loadComponent: () => import('./shared/components/view-or-edit/view-or-edit.component').then((m) => m.ViewOrEditComponent),
+    canActivate: [authTokenGuard],
+  },
+  {
     path: '',
     redirectTo: '/login',
     pathMatch: 'full',

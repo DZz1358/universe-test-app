@@ -15,6 +15,10 @@ export class DocumentsService {
     });
   }
 
+  getDocument(id: string) {
+    return this.http.get(`${environment.apiUrl}/document/${id}`)
+  }
+
   createDocument(data: any) {
     let formData = new FormData()
 

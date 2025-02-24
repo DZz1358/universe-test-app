@@ -20,7 +20,6 @@ export class RoleCheckDirective {
   ) { }
 
   private updateView(roles: string[]) {
-    console.log('roles', roles);
     if (this.currentUser && roles.includes(this.currentUser.role)) {
       this.viewContainer.createEmbeddedView(this.templateRef);
     } else {
