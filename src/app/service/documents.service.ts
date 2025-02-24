@@ -19,6 +19,27 @@ export class DocumentsService {
     return this.http.get(`${environment.apiUrl}/document/${id}`)
   }
 
+  updateDocument(id: string, name: string) {
+    return this.http.patch(`${environment.apiUrl}/document/${id}`, {
+      name
+    })
+  }
+
+  updateDocumentStatus(id: string, status: string) {
+    return this.http.post(`${environment.apiUrl}/document/${id}/change-status`, {
+      status
+    })
+  }
+
+
+  revokeDocument(id: string) {
+    return this.http.post(`${environment.apiUrl}/document/${id}/revoke-review`, {})
+  }
+
+  removeDocument(id: string) {
+    return this.http.delete(`${environment.apiUrl}/document/${id}`)
+  }
+
   createDocument(data: any) {
     let formData = new FormData()
 

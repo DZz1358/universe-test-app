@@ -3,7 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { Router, RouterModule } from '@angular/router';
 import { StorageService } from '../../service/storage.service';
 import { MatDialog } from '@angular/material/dialog';
-import { CreateDocumentComponent } from '../../../features/dashboard/create-document/create-document.component';
+import { CreateDocumentComponent } from '../create-document/create-document.component';
 import { filter, Subject, takeUntil } from 'rxjs';
 import { DocumentsService } from '../../../service/documents.service';
 import { RoleCheckDirective } from '../../directives/role-check.directive';
@@ -42,7 +42,9 @@ export class HeaderComponent implements OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe((data) => {
-        this.documentService.createDocument(data).subscribe()
+        this.documentService.createDocument(data).subscribe(() => {
+          window.location.reload();
+        })
       });
   }
 

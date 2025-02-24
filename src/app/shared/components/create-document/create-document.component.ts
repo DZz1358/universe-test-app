@@ -9,7 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { RouterModule } from '@angular/router';
 import { Subject } from 'rxjs';
-import { documentStatuses } from '../../../shared/const/document-status.const';
+import { documentStatuses } from '../../const/document-status.const';
 
 @Component({
   selector: 'app-create-document',

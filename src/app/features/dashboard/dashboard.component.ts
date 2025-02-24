@@ -49,7 +49,7 @@ interface IResponse {
 })
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   userService = inject(UserService);
-  DocumentsService = inject(DocumentsService);
+  documentsService = inject(DocumentsService);
   storageService = inject(StorageService);
   router = inject(Router);
   public statusesDocuments = documentStatuses;
@@ -85,6 +85,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   isReviewer(user: any): boolean {
     return user?.role === 'REVIEWER';
   }
+
   public form: FormGroup = this.fb.group({
     status: [null],
     creatorId: [null],
@@ -145,7 +146,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       };
     }
 
-    this.DocumentsService.getDocuments(params).subscribe((data: any) => {
+    this.documentsService.getDocuments(params).subscribe((data: any) => {
       this.dataSource.data = data.results;
       this.paginatorPage = this.paginator.pageIndex;
       this.resultsLength = data.count;

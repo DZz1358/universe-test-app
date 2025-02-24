@@ -1,1 +1,79 @@
-<p>view-or-edit works!</p>
+<div class="container">
+  <button
+    color="primary"
+    mat-raised-button
+    type="button"
+    class="back-btn"
+    [routerLink]="['/dashboard']"
+  >
+    Back
+  </button>
+
+  <mat-card>
+    <form [formGroup]="form" (ngSubmit)="submit()" class="page-heading">
+      <div>
+        @if(!isReviewerUser){
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Name document</mat-label>
+          <input type="text" matInput [formControl]="nameFC" />
+          @if (nameFC.invalid) {
+          <mat-error>Field is required</mat-error>
+          }
+        </mat-form-field>
+        } @if(isReviewerUser){
+        <mat-form-field appearance="outline" class="">
+          <mat-label>Choose status</mat-label>
+          <mat-select [formControl]="statusFC">
+            @for (status of statusesDocuments; track status) {
+            <mat-option [value]="status.value">{{
+              status.viewValue
+            }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        }
+      </div>
+
+      <button
+        color="primary"
+        class="full-width"
+        mat-raised-button
+        type="submit"
+        [disabled]="isFormInvalid()"
+      >
+        Update
+      </button>
+
+      @if (!isReviewerUser && (document.status === "DRAFT" || document.status
+      === "REVOKE")) {
+      <button
+        color="primary"
+        class="full-width"
+        mat-raised-button
+        type="button"
+        (click)="handleDocumentAction('remove')"
+      >
+        Delete a document
+      </button>
+
+      } @if (!isReviewerUser && document.status === "READY_FOR_REVIEW" ) {
+
+      <button
+        color="primary"
+        class="full-width"
+        mat-raised-button
+        type="button"
+        (click)="handleDocumentAction('revoke')"
+      >
+        Revoke a document
+      </button>
+      }
+    </form>
+  </mat-card>
+
+  <mat-card class="" appearance="outlined">
+    <div class="pdf-viewer">
+      <div id="pspdfkit-container" style="width: 100%; height: 100vh"></div>
+    </div>
+  </mat-card>
+</div>
