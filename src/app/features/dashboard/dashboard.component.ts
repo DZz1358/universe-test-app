@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { StorageService } from '../../shared/service/storage.service';
 import { DashboardService } from '../../service/dashboard.service';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { UserService } from '../../shared/service/user.service';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { HeaderComponent } from '../../shared/components/header/header.component';
@@ -62,7 +62,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   public displayedColumns = ['name', 'creator', 'status', 'updatedAt'];
 
   public resultsLength = 0;
-  public paginatorPage = 0;
+  public paginatorPage = 1;
   public paginatorPageSize = 10;
 
   get creatorEmailFC(): FormControl {
@@ -95,18 +95,26 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       this.getDocumentsFilter(true);
     })
   }
-
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
+
+    this.paginator.page.subscribe((event: PageEvent) => {
+      console.log('Пагинация изменилась:', event);
+      // this.paginatorPage = event.pageIndex;
+      // this.paginatorPageSize = event.pageSize;
+      // this.getDocumentsFilter();
+    });
   }
 
-  public getDocumentsFilter(formChanges = false) {
-    let params: any = {
-      page: this.paginator?.pageIndex ? this.paginator.pageIndex + 1 : 1,
-      size: this.paginatorPageSize ? this.paginatorPageSize : 10,
-    };
 
+  public getDocumentsFilter(formChanges = false) {
+    console.log('this.paginator', this.paginator)
+
+    let params: any = {
+      page: this.paginator?.pageIndex !== undefined ? this.paginator.pageIndex + 1 : 1,
+      size: this.paginatorPageSize,
+    };
     if (formChanges) {
       params = {
         ...params,
@@ -119,7 +127,9 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.dashboardService.getDocuments(params).subscribe((data: any) => {
       this.dataSource.data = data.results;
+      this.paginatorPage = this.paginator.pageIndex;
       this.resultsLength = data.count;
+
     });
   }
 
