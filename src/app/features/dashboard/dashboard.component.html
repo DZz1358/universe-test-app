@@ -35,6 +35,7 @@
 
 <div class="page-content">
   <mat-card appearance="outlined" class="">
+    @if (dataSource.data.length && !isLoading()) {
     <mat-table class="" [dataSource]="dataSource" matSort>
       <ng-container matColumnDef="name">
         <mat-header-cell
@@ -115,6 +116,13 @@
       <mat-row *matRowDef="let row; columns: displayedColumns"> </mat-row>
     </mat-table>
 
+    } @if (!dataSource.data.length && !isLoading()) {
+    <h2>This view does not contain any elements</h2>
+    } @if (isLoading()) {
+    <div class="wrapper-loader">
+      <span class="loader"></span>
+    </div>
+    }
     <mat-paginator
       [length]="resultsLength"
       [pageIndex]="paginatorPage"

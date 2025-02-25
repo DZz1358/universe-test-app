@@ -38,6 +38,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   public filteredUsers = signal<IUser[]>([]);
   public currentUser = signal<IUser | null>(null);
   private destroyRef = inject(DestroyRef);
+  public isLoading = signal(true);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -98,6 +99,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       .subscribe((filteredUsers: IUser[]) => {
         this.filteredUsers.set(filteredUsers);
         this.statusesDocuments.set(this.statusesDocuments().filter(status => status.value !== DocumentStatus.DRAFT));
+        this.isLoading.set(false);
       });
   }
 
@@ -105,6 +107,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     this.dataSource.sort = this.sort;
 
     this.paginator.page.subscribe((event: PageEvent) => {
+      this.isLoading.set(true);
       this.paginatorPage = event.pageIndex;
       this.paginatorPageSize = event.pageSize;
       this.getDocumentsFilter();
@@ -132,6 +135,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         this.dataSource.data = data.results;
         this.paginatorPage = this.paginator.pageIndex;
         this.resultsLength = data.count;
+        this.isLoading.set(false);
       });
   }
 
