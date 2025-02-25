@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { StorageService } from '../../../../shared/service/storage.service';
 import { AuthService } from '../../service/auth.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,6 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { userRole } from '../../../../shared/const/status-user.const';
+import { LoginResponse, RegisterResponse } from '../../../../shared/interfaces/interfaces';
 
 @Component({
   selector: 'app-registration',
@@ -21,16 +22,15 @@ import { userRole } from '../../../../shared/const/status-user.const';
   standalone: true,
 })
 export class RegistrationComponent {
-  private fb = inject(FormBuilder);
+  fb = inject(FormBuilder);
   authService = inject(AuthService);
   router = inject(Router);
   storageService = inject(StorageService);
-  private destroy$ = new Subject<void>();
+  destroy$ = new Subject<void>();
   errorMessage = signal('');
   hide = signal(true);
 
-  public statuses = userRole;
-
+  public roles = signal(userRole);
 
   get fullNameFC(): FormControl {
     return this.registerForm.get('fullName') as FormControl;
@@ -42,8 +42,8 @@ export class RegistrationComponent {
   get passwordFC(): FormControl {
     return this.registerForm.get('password') as FormControl;
   }
-  get statusFC(): FormControl {
-    return this.registerForm.get('status') as FormControl;
+  get roleFC(): FormControl {
+    return this.registerForm.get('role') as FormControl;
   }
 
 
@@ -51,13 +51,8 @@ export class RegistrationComponent {
     email: ['', [Validators.required]],
     password: ['', [Validators.required]],
     fullName: ['', [Validators.required]],
-    status: ['', [Validators.required]],
+    role: ['', [Validators.required]],
   });
-
-
-  ngOnInit(): void {
-  }
-
 
   updateErrorMessage() {
     if (this.emailFC.hasError('required')) {
@@ -76,18 +71,25 @@ export class RegistrationComponent {
 
   submit(registerForm: any) {
     const data = registerForm.value;
+    const { password } = data;
+
     this.authService.registration(data)
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        takeUntil(this.destroy$),
+        switchMap((response: RegisterResponse) =>
+          this.authService.login({ email: response.email, password })
+        )
+      )
       .subscribe({
-        next: response => {
-          this.router.navigate(['/login']);
+        next: (loginResponse: any) => {
+          this.storageService.setToLocalStore('access_token', loginResponse.access_token);
+          this.router.navigate(['/dashboard']);
         },
-        error: err => {
+        error: (err) => {
           this.errorMessage = err.message;
         },
       });
   }
-
 
 
 }

@@ -17,3 +17,14 @@ export interface IResponse {
   results: IUser[],
   count: number,
 }
+
+export interface RegisterResponse {
+  email: string;
+  password: string;
+  fullName?: string;
+  role?: string;
+}
+
+export interface LoginResponse {
+  access_token: string;
+}

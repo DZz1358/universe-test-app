@@ -54,10 +54,10 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Choose status</mat-label>
-        <mat-select [formControl]="statusFC">
-          @for (status of statuses; track status) {
-          <mat-option [value]="status.value">{{ status.viewValue }}</mat-option>
+        <mat-label>Choose role</mat-label>
+        <mat-select [formControl]="roleFC">
+          @for (role of roles(); track role) {
+          <mat-option [value]="role.value">{{ role.viewValue }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
