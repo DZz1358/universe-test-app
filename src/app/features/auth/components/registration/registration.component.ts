@@ -10,7 +10,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { userStatuses } from '../../../../shared/const/status-user.const';
+import { userRole } from '../../../../shared/const/status-user.const';
 
 @Component({
   selector: 'app-registration',
@@ -29,7 +29,7 @@ export class RegistrationComponent {
   errorMessage = signal('');
   hide = signal(true);
 
-  public statuses = userStatuses;
+  public statuses = userRole;
 
 
   get fullNameFC(): FormControl {

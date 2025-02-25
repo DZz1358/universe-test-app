@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
+import { IResponse } from '../shared/interfaces/interfaces';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +11,7 @@ export class DocumentsService {
   private http = inject(HttpClient);
   constructor() { }
 
-  getDocuments(data: any) {
+  getDocuments(data: any): Observable<any> {
     return this.http.get(`${environment.apiUrl}/document`, {
       params: data
     });

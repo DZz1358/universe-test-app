@@ -1,7 +1,7 @@
 <app-header></app-header>
 
 <mat-card class="page-heading">
-  <mat-form-field appearance="outline" class="">
+  <mat-form-field appearance="outline">
     <mat-label>Choose status</mat-label>
     <mat-select [formControl]="statusFC">
       @for (status of statusesDocuments(); track $index) {
@@ -10,7 +10,7 @@
     </mat-select>
   </mat-form-field>
 
-  <mat-form-field appearance="outline" class="full-width">
+  <mat-form-field appearance="outline">
     <mat-label>Creator</mat-label>
     <input
       type="text"
@@ -116,24 +116,11 @@
     </mat-table>
 
     <mat-paginator
-      [length]="resultsLength()"
+      [length]="resultsLength"
       [pageIndex]="paginatorPage"
       [pageSize]="paginatorPageSize"
       [pageSizeOptions]="[1, 5, 10, 15]"
     >
     </mat-paginator>
   </mat-card>
-
-  <pre
-    >{{ resultsLength() }}
-</pre
-  >
-  <pre
-    >{{ paginatorPage }}
-</pre
-  >
-  <pre
-    >{{ paginatorPageSize }}
-</pre
-  >
 </div>

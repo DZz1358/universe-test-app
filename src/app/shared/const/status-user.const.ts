@@ -1,5 +1,5 @@
 
-export const userStatuses = [
+export const userRole = [
   {
     value: 'USER', viewValue: 'User'
   },
@@ -8,3 +8,8 @@ export const userStatuses = [
   },
 
 ];
+
+export enum UserRole {
+  USER = 'USER',
+  REVIEWER = 'REVIEWER',
+}
