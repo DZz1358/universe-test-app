@@ -10,8 +10,6 @@ import { IResponse, IUser } from '../interfaces/interfaces';
 export class UserService {
   private http = inject(HttpClient);
 
-  constructor() { }
-
   getUser(): Observable<IUser> {
     return this.http.get<IUser>(`${environment.apiUrl}/user`);
   }

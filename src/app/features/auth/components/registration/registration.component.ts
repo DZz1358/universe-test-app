@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { Subject, switchMap, takeUntil } from 'rxjs';
 import { StorageService } from '../../../../shared/service/storage.service';
 import { AuthService } from '../../service/auth.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,7 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { userRole } from '../../../../shared/const/status-user.const';
-import { LoginResponse, RegisterResponse } from '../../../../shared/interfaces/interfaces';
+import { RegisterResponse } from '../../../../shared/interfaces/interfaces';
 
 @Component({
   selector: 'app-registration',
@@ -19,17 +19,16 @@ import { LoginResponse, RegisterResponse } from '../../../../shared/interfaces/i
     MatInputModule, MatIconModule, MatButtonModule, MatCardModule, MatSelectModule, RouterModule],
   templateUrl: './registration.component.html',
   styleUrl: './registration.component.scss',
-  standalone: true,
 })
-export class RegistrationComponent {
-  fb = inject(FormBuilder);
-  authService = inject(AuthService);
-  router = inject(Router);
-  storageService = inject(StorageService);
-  destroy$ = new Subject<void>();
-  errorMessage = signal('');
-  hide = signal(true);
 
+export class RegistrationComponent {
+  private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private storageService = inject(StorageService);
+  private destroy$ = new Subject<void>();
+  public errorMessage = signal('');
+  public hide = signal(true);
   public roles = signal(userRole);
 
   get fullNameFC(): FormControl {
@@ -45,7 +44,6 @@ export class RegistrationComponent {
   get roleFC(): FormControl {
     return this.registerForm.get('role') as FormControl;
   }
-
 
   public registerForm: FormGroup = this.fb.group({
     email: ['', [Validators.required]],
@@ -90,6 +88,5 @@ export class RegistrationComponent {
         },
       });
   }
-
 
 }

@@ -18,13 +18,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   styleUrl: './header.component.scss',
 })
 export class HeaderComponent implements OnInit {
-  userService = inject(UserService);
-  documentService = inject(DocumentsService);
-  storageService = inject(StorageService);
-  router = inject(Router);
-  dialog = inject(MatDialog);
-  destroyRef = inject(DestroyRef);
-  currentUser = signal<IUser | null>(null);
+  private userService = inject(UserService);
+  private documentService = inject(DocumentsService);
+  private storageService = inject(StorageService);
+  private router = inject(Router);
+  private dialog = inject(MatDialog);
+  private destroyRef = inject(DestroyRef);
+  public currentUser = signal<IUser | null>(null);
 
   ngOnInit(): void {
     this.getUser();
@@ -38,7 +38,6 @@ export class HeaderComponent implements OnInit {
       .subscribe((data: IUser) => {
         this.currentUser.set(data);
       });
-
   }
 
   logout() {

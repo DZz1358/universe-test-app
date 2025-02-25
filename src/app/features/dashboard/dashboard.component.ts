@@ -5,7 +5,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
-import { StorageService } from '../../shared/service/storage.service';
 import { DocumentsService } from '../../service/documents.service';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -38,7 +37,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   public statusesDocuments = signal(documentStatuses);
   public filteredUsers = signal<IUser[]>([]);
   public currentUser = signal<IUser | null>(null);
-  destroyRef = inject(DestroyRef);
+  private destroyRef = inject(DestroyRef);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;

@@ -25,19 +25,19 @@ import { UserService } from '../../service/user.service';
   styleUrl: './view-or-edit.component.scss',
 })
 export class ViewOrEditComponent implements OnInit {
-  activatedRoute = inject(ActivatedRoute);
-  documentService = inject(DocumentsService);
-  storageService = inject(StorageService);
-  userService = inject(UserService);
-  fb = inject(FormBuilder);
-  destroyRef = inject(DestroyRef);
+  private activatedRoute = inject(ActivatedRoute);
+  private documentService = inject(DocumentsService);
+  private storageService = inject(StorageService);
+  private userService = inject(UserService);
+  private fb = inject(FormBuilder);
+  private destroyRef = inject(DestroyRef);
 
-  router = inject(Router);
-  destroy$ = new Subject<void>();
-  statusesDocuments = signal(documentStatuses);
-  documentId = signal<string>('');
-  document = signal<IDocument | null>(null);
-  currentUser = signal<IUser | null>(null);
+  private router = inject(Router);
+  private destroy$ = new Subject<void>();
+  public statusesDocuments = signal(documentStatuses);
+  private documentId = signal<string>('');
+  public document = signal<IDocument | null>(null);
+  public currentUser = signal<IUser | null>(null);
 
   get nameFC(): FormControl {
     return this.form.get('name') as FormControl;

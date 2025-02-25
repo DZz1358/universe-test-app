@@ -8,7 +8,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { RouterModule } from '@angular/router';
-import { Subject } from 'rxjs';
 import { DocumentStatus, documentStatuses } from '../../const/document-status.const';
 
 @Component({
@@ -19,12 +18,12 @@ import { DocumentStatus, documentStatuses } from '../../const/document-status.co
   styleUrl: './create-document.component.scss',
 })
 export class CreateDocumentComponent {
-  fb = inject(FormBuilder);
-  dialogRef = inject(MatDialogRef);
-  destroyRef = inject(DestroyRef);
+  private fb = inject(FormBuilder);
+  private dialogRef = inject(MatDialogRef);
+  private destroyRef = inject(DestroyRef);
 
-  selectedFile: File | null = null
-  statusesDocuments = signal(documentStatuses);
+  public selectedFile: File | null = null
+  public statusesDocuments = signal(documentStatuses);
 
   get nameFC(): FormControl {
     return this.form.get('name') as FormControl;

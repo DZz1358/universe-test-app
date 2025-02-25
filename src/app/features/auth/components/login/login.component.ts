@@ -17,14 +17,15 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   imports: [FormsModule, ReactiveFormsModule, MatFormFieldModule,
     MatInputModule, MatIconModule, MatButtonModule, MatCardModule, RouterModule],
 })
+
 export class LoginComponent {
-  fb = inject(FormBuilder);
-  authService = inject(AuthService);
-  router = inject(Router);
-  storageService = inject(StorageService);
-  errorMessage = signal('');
-  hide = signal(true);
-  destroyRef = inject(DestroyRef);
+  private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private storageService = inject(StorageService);
+  public errorMessage = signal('');
+  public hide = signal(true);
+  private destroyRef = inject(DestroyRef);
 
   get emailFC(): FormControl {
     return this.loginForm.get('email') as FormControl;

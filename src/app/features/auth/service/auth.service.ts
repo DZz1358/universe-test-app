@@ -7,10 +7,7 @@ import { RegisterResponse } from '../../../shared/interfaces/interfaces';
   providedIn: 'root'
 })
 export class AuthService {
-
   private http = inject(HttpClient);
-  constructor() { }
-
 
   login(data: RegisterResponse) {
     return this.http.post<RegisterResponse>(`${environment.apiUrl}/auth/login`, data);
