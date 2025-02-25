@@ -4,8 +4,8 @@
     <span>{{ currentUser()?.role }}</span>
   </div>
   <div class="button-container">
+    @if(currentUser()?.role === "USER") {
     <button
-      *appRoleCheck="['USER']"
       (click)="addDocument()"
       color="primary"
       mat-raised-button
@@ -13,6 +13,8 @@
     >
       Add new document
     </button>
+
+    }
     <button
       (click)="logout()"
       class="logout-btn"

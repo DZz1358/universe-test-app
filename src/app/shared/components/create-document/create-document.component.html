@@ -23,7 +23,7 @@
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Choose status</mat-label>
       <mat-select required [formControl]="statusFC">
-        @for (status of statuses; track status) {
+        @for (status of statusesDocuments(); track status) {
         <mat-option [value]="status.value">{{ status.viewValue }}</mat-option>
         }
       </mat-select>

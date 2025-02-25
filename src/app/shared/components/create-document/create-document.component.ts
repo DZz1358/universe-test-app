@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -9,7 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { RouterModule } from '@angular/router';
 import { Subject } from 'rxjs';
-import { documentStatuses } from '../../const/document-status.const';
+import { DocumentStatus, documentStatuses } from '../../const/document-status.const';
 
 @Component({
   selector: 'app-create-document',
@@ -17,14 +17,14 @@ import { documentStatuses } from '../../const/document-status.const';
     MatInputModule, MatIconModule, MatButtonModule, MatCardModule, MatSelectModule, RouterModule],
   templateUrl: './create-document.component.html',
   styleUrl: './create-document.component.scss',
-  standalone: true
 })
 export class CreateDocumentComponent {
-  private fb = inject(FormBuilder);
-  private destroy$ = new Subject<void>();
+  fb = inject(FormBuilder);
   dialogRef = inject(MatDialogRef);
+  destroyRef = inject(DestroyRef);
+
   selectedFile: File | null = null
-  public statuses = documentStatuses;
+  statusesDocuments = signal(documentStatuses);
 
   get nameFC(): FormControl {
     return this.form.get('name') as FormControl;
@@ -43,8 +43,14 @@ export class CreateDocumentComponent {
   }
 
   initStatuses(): void {
-    const valuesToSelect = ['DRAFT', 'READY_FOR_REVIEW'];
-    this.statuses = this.statuses.filter(value => valuesToSelect.includes(value.value));
+    const valuesToSelect: DocumentStatus[] = [
+      DocumentStatus.DRAFT,
+      DocumentStatus.READY_FOR_REVIEW,
+    ];
+
+    this.statusesDocuments.set(this.statusesDocuments().filter(status =>
+      valuesToSelect.includes(status.value as DocumentStatus)
+    ));
   }
 
   onFileSelected(event: Event) {
@@ -65,11 +71,6 @@ export class CreateDocumentComponent {
 
   public cancel(): void {
     this.dialogRef.close();
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
 

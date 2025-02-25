@@ -6,7 +6,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { CreateDocumentComponent } from '../create-document/create-document.component';
 import { filter } from 'rxjs';
 import { DocumentsService } from '../../../service/documents.service';
-import { RoleCheckDirective } from '../../directives/role-check.directive';
 import { IUser } from '../../interfaces/interfaces';
 import { UserService } from '../../service/user.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -14,7 +13,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-header',
-  imports: [MatButtonModule, RouterModule, RoleCheckDirective],
+  imports: [MatButtonModule, RouterModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })
