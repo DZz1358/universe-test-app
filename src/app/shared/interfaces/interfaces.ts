@@ -28,3 +28,11 @@ export interface RegisterResponse {
 export interface LoginResponse {
   access_token: string;
 }
+export interface IDocument {
+  createdAt: string;
+  fileUrl: string;
+  id: string;
+  name: string;
+  status: string;
+  updatedAt: string;
+}

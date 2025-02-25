@@ -21,10 +21,10 @@
           }
         </mat-form-field>
         } @if(isReviewerUser){
-        <mat-form-field appearance="outline" class="">
+        <mat-form-field appearance="outline" class="full-width">
           <mat-label>Choose status</mat-label>
           <mat-select [formControl]="statusFC">
-            @for (status of statusesDocuments; track status) {
+            @for (status of statusesDocuments(); track status) {
             <mat-option [value]="status.value">{{
               status.viewValue
             }}</mat-option>
@@ -44,8 +44,8 @@
         Update
       </button>
 
-      @if (!isReviewerUser && (document?.status === "DRAFT" || document?.status
-      === "REVOKE")) {
+      @if (!isReviewerUser && (document()?.status === "DRAFT" ||
+      document()?.status === "REVOKE")) {
       <button
         color="primary"
         class="full-width"
@@ -56,7 +56,7 @@
         Delete a document
       </button>
 
-      } @if (!isReviewerUser && document?.status === "READY_FOR_REVIEW" ) {
+      } @if (!isReviewerUser && document()?.status === "READY_FOR_REVIEW" ) {
 
       <button
         color="primary"
