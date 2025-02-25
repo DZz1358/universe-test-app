@@ -1,4 +1,8 @@
 <div class="card-container">
+  <div class="user-info">
+    <p>{{ currentUser()?.fullName }}</p>
+    <span>{{ currentUser()?.role }}</span>
+  </div>
   <div class="button-container">
     <button
       *appRoleCheck="['USER']"

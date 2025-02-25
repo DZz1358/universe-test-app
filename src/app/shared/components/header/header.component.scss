@@ -1,10 +1,22 @@
 .card-container {
+  display: flex;
+  justify-content: space-between;
   margin-bottom: 15px;
   padding: 16px;
   border-bottom: 2px solid rgba(0, 0, 0, 0.1);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.user-info {
+  p {
+    font-weight: 600;
+    margin: 0;
+  }
+
+  span {
+    font-size: 14px;
+  }
+}
 
 .button-container {
   display: flex;
