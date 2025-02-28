@@ -12,22 +12,22 @@
       <input
         matInput
         placeholder="Name document"
-        [formControl]="nameFC"
+        formControlName="name"
         required
       />
-      @if (nameFC.invalid) {
+      @if (form.get('name')?.invalid) {
       <mat-error>You must enter a value</mat-error>
       }
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Choose status</mat-label>
-      <mat-select required [formControl]="statusFC">
+      <mat-select required formControlName="status">
         @for (status of statusesDocuments(); track status) {
         <mat-option [value]="status.value">{{ status.viewValue }}</mat-option>
         }
       </mat-select>
-      @if (statusFC.invalid) {
+      @if (form.get('status')?.invalid) {
       <mat-error>You must enter a value</mat-error>
       }
     </mat-form-field>
@@ -37,10 +37,15 @@
     <div class="uploader">
       <input type="file" (change)="onFileSelected($event)" />
     </div>
+    @if (selectedFile && selectedFile.type !== 'application/pdf') {
+    <div class="custom-error-text">
+      <mat-error>Incorrect type file, must be only pdf type</mat-error>
+    </div>
+    }
 
     <button
       color="primary"
-      class="full-width"
+      class="full-width btn-submit"
       mat-raised-button
       type="submit"
       [disabled]="form.invalid"

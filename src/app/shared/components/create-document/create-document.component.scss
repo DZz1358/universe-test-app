@@ -27,8 +27,15 @@ form {
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 15px;
-  margin-bottom: 20px;
+}
 
+.custom-error-text {
+  font-size: 12px;
+  padding-left: 10px;
+}
+
+.btn-submit {
+  margin-top: 20px;
 }
 
 label {

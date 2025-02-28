@@ -20,17 +20,8 @@ import { DocumentStatus, documentStatuses } from '../../const/document-status.co
 export class CreateDocumentComponent {
   private fb = inject(FormBuilder);
   private dialogRef = inject(MatDialogRef);
-  private destroyRef = inject(DestroyRef);
-
   public selectedFile: File | null = null
   public statusesDocuments = signal(documentStatuses);
-
-  get nameFC(): FormControl {
-    return this.form.get('name') as FormControl;
-  }
-  get statusFC(): FormControl {
-    return this.form.get('status') as FormControl;
-  }
 
   public form: FormGroup = this.fb.group({
     name: ['', [Validators.required]],
@@ -71,6 +62,5 @@ export class CreateDocumentComponent {
   public cancel(): void {
     this.dialogRef.close();
   }
-
 
 }
