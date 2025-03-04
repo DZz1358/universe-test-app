@@ -1,36 +1,38 @@
 <app-header></app-header>
 
 <mat-card class="page-heading">
-  <mat-form-field appearance="outline">
-    <mat-label>Choose status</mat-label>
-    <mat-select [formControl]="statusFC">
-      @for (status of statusesDocuments(); track $index) {
-      <mat-option [value]="status.value">{{ status.viewValue }}</mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
+  <form [formGroup]="form">
+    <mat-form-field appearance="outline">
+      <mat-label>Choose status</mat-label>
+      <mat-select formControlName="status">
+        @for (status of statusesDocuments(); track $index) {
+        <mat-option [value]="status.value">{{ status.viewValue }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
 
-  <mat-form-field appearance="outline">
-    <mat-label>Creator</mat-label>
-    <input
-      type="text"
-      matInput
-      [matAutocomplete]="auto"
-      [formControl]="creatorIdFC"
-    />
-    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayUserName">
-      @for (user of filteredUsers(); track user.id) {
-      <mat-option [value]="user">
-        {{ user.fullName }}
-      </mat-option>
-      }
-    </mat-autocomplete>
-  </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Creator</mat-label>
+      <input
+        type="text"
+        matInput
+        [matAutocomplete]="auto"
+        formControlName="creatorId"
+      />
+      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayUserName">
+        @for (user of filteredUsers(); track user.id) {
+        <mat-option [value]="user">
+          {{ user.fullName }}
+        </mat-option>
+        }
+      </mat-autocomplete>
+    </mat-form-field>
 
-  <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Creator Email</mat-label>
-    <input type="text" matInput [formControl]="creatorEmailFC" />
-  </mat-form-field>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Creator Email</mat-label>
+      <input type="text" matInput formControlName="creatorEmail" />
+    </mat-form-field>
+  </form>
 </mat-card>
 
 <div class="page-content">
@@ -97,11 +99,11 @@
           ><mat-icon>settings</mat-icon></mat-header-cell
         >
         <mat-cell class="setting-column" mat-cell *matCellDef="let row">
-          @if (!isReviewerUser) {
+          @if (!isReviewer()) {
           <button mat-icon-button (click)="navigateToDocument(row.id)">
             <mat-icon>edit</mat-icon>
           </button>
-          } @if (isReviewerUser) {
+          } @if (isReviewer()) {
 
           <button mat-icon-button (click)="navigateToDocument(row.id)">
             <mat-icon>visibility</mat-icon>

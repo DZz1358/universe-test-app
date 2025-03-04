@@ -1,5 +1,5 @@
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AfterViewInit, Component, DestroyRef, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AfterViewInit, Component, computed, DestroyRef, effect, inject, signal, ViewChild } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -17,7 +17,7 @@ import { DatePipe } from '@angular/common';
 import { DocumentStatus, documentStatuses } from '../../shared/const/document-status.const';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { filter, map, switchMap, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs';
 import { UserRole } from '../../shared/const/status-user.const';
 import { IResponse, IUser } from '../../shared/interfaces/interfaces';
 
@@ -28,7 +28,7 @@ import { IResponse, IUser } from '../../shared/interfaces/interfaces';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
-export class DashboardComponent implements OnInit, AfterViewInit {
+export class DashboardComponent implements AfterViewInit {
   private userService = inject(UserService);
   private documentsService = inject(DocumentsService);
   private router = inject(Router);
@@ -44,24 +44,19 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   public dataSource = new MatTableDataSource([]);
-  public displayedColumns = ['name', 'creator', 'status', 'updatedAt', 'settings'];
+  public displayedColumns = ['name', 'creator', 'status', 'updatedAt', 'settings']
   public resultsLength: number = 0;
   public paginatorPage: number = 0;
   public paginatorPageSize: number = 10;
 
-  get creatorEmailFC(): FormControl {
-    return this.form.get('creatorEmail') as FormControl;
-  }
-  get creatorIdFC(): FormControl {
-    return this.form.get('creatorId') as FormControl;
-  }
-
-  get statusFC(): FormControl {
-    return this.form.get('status') as FormControl;
-  }
-
-  get isReviewerUser(): boolean {
+  isReviewer = computed(() => {
     return this.currentUser()?.role === UserRole.REVIEWER;
+  })
+
+  constructor() {
+    this.initState();
+    this.changeForm();
+    this.getDocumentsFilter(false);
   }
 
   public form: FormGroup = this.fb.group({
@@ -69,41 +64,37 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     creatorId: [null],
     creatorEmail: [null],
   });
-
-  ngOnInit(): void {
-    this.initState();
-    this.getDocumentsFilter(false);
-    this.changeForm();
+  changeForm(): void {
+    effect(() => {
+      this.form.valueChanges.pipe(
+        debounceTime(300),
+        takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => this.getDocumentsFilter(true));
+    });
   }
-
-  changeForm() {
-    this.form.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.getDocumentsFilter(true));
-  }
-
-  initState() {
-    this.userService.getUser()
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
+  initState(): void {
+    effect(() => {
+      this.userService.getUser().pipe(
         tap((data: IUser) => {
           this.currentUser.set(data);
-          if (!this.isReviewerUser) {
-            this.displayedColumns = this.displayedColumns.filter(column => column !== 'creator');
+          if (!this.isReviewer()) {
+            this.displayedColumns = this.displayedColumns.filter(column => column !== 'creator')
           }
         }),
-        filter(() => this.isReviewerUser),
+        filter(() => this.isReviewer()),
         switchMap(() => this.userService.getUsersList()),
-        map((users: IResponse) => users.results)
-      )
-      .subscribe((filteredUsers: IUser[]) => {
+        map((users: IResponse) => users.results),
+        takeUntilDestroyed(this.destroyRef)
+      ).subscribe((filteredUsers: IUser[]) => {
         this.filteredUsers.set(filteredUsers);
         this.statusesDocuments.set(this.statusesDocuments().filter(status => status.value !== DocumentStatus.DRAFT));
         this.isLoading.set(false);
       });
+
+    })
   }
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
 
     this.paginator.page.subscribe((event: PageEvent) => {
@@ -114,7 +105,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     });
   }
 
-  getDocumentsFilter(formChanges = false) {
+  getDocumentsFilter(formChanges = false): void {
     let params = {
       page: this.paginator?.pageIndex !== undefined ? this.paginator.pageIndex + 1 : 1,
       size: this.paginatorPageSize,
