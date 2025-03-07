@@ -40,7 +40,7 @@ export class LoginComponent {
     password: ['', [Validators.required]],
   });
 
-  updateErrorMessage() {
+  updateErrorMessage(): void {
     if (this.emailFC.hasError('required')) {
       this.errorMessage.set('You must enter a value');
     } else if (this.emailFC.hasError('email')) {
@@ -50,12 +50,12 @@ export class LoginComponent {
     }
   }
 
-  clickEvent(event: MouseEvent) {
+  clickEvent(event: MouseEvent): void {
     this.hide.set(!this.hide());
     event.stopPropagation();
   }
 
-  submit(loginForm: any) {
+  submit(loginForm: any): void {
     const data = loginForm.value;
     this.authService.login(data).pipe(
       takeUntilDestroyed(this.destroyRef),

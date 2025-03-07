@@ -52,7 +52,7 @@ export class RegistrationComponent {
     role: ['', [Validators.required]],
   });
 
-  updateErrorMessage() {
+  updateErrorMessage(): void {
     if (this.emailFC.hasError('required')) {
       this.errorMessage.set('You must enter a value');
     } else if (this.emailFC.hasError('email')) {
@@ -62,12 +62,12 @@ export class RegistrationComponent {
     }
   }
 
-  clickEvent(event: MouseEvent) {
+  clickEvent(event: MouseEvent): void {
     this.hide.set(!this.hide());
     event.stopPropagation();
   }
 
-  submit(registerForm: any) {
+  submit(registerForm: any): void {
     const data = registerForm.value;
     const { password } = data;
 
