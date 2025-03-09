@@ -50,7 +50,7 @@ export class CreateDocumentComponent {
     }
   }
 
-  public onSubmit(form: any): void {
+  public onSubmit(form: FormGroup): void {
     if (form.valid) {
       this.dialogRef.close({
         ...form.value,

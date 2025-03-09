@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { DocumentsService } from '../../../service/documents.service';
 import PSPDFKit from 'pspdfkit';
@@ -31,9 +31,7 @@ export class ViewOrEditComponent implements OnInit {
   private userService = inject(UserService);
   private fb = inject(FormBuilder);
   private destroyRef = inject(DestroyRef);
-
   private router = inject(Router);
-  private destroy$ = new Subject<void>();
   public statusesDocuments = signal(documentStatuses);
   private documentId = signal<string>('');
   public document = signal<IDocument | null>(null);
@@ -47,12 +45,12 @@ export class ViewOrEditComponent implements OnInit {
     return this.form.get('status') as FormControl;
   }
 
-  get isReviewerUser(): boolean {
+  isReviewer = computed(() => {
     return this.currentUser()?.role === UserRole.REVIEWER;
-  }
+  })
 
   isFormInvalid(): boolean {
-    return this.isReviewerUser ? this.statusFC.invalid : this.nameFC.invalid;
+    return this.isReviewer() ? this.statusFC.invalid : this.nameFC.invalid;
   }
 
   public form: FormGroup = this.fb.group({
@@ -70,7 +68,7 @@ export class ViewOrEditComponent implements OnInit {
     });
   }
 
-  getUser() {
+  getUser(): void {
     this.userService.getUser()
       .pipe(
         takeUntilDestroyed(this.destroyRef),
@@ -80,11 +78,11 @@ export class ViewOrEditComponent implements OnInit {
       });
   }
 
-  loadDocumentData() {
+  loadDocumentData(): void {
     this.documentService.getDocument(this.documentId())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data: any) => {
-        if (!this.isReviewerUser) {
+        if (!this.isReviewer()) {
           this.nameFC.patchValue(data.name)
         }
         this.document.set(data);
@@ -104,7 +102,7 @@ export class ViewOrEditComponent implements OnInit {
     ));
   }
 
-  loadDocument() {
+  loadDocument(): void {
     PSPDFKit.load({
       baseUrl: location.protocol + "//" + location.host + "/assets/",
       document: this.document()!.fileUrl,
@@ -115,8 +113,8 @@ export class ViewOrEditComponent implements OnInit {
     });
   }
 
-  submit() {
-    const updateData = this.isReviewerUser
+  submit(): void {
+    const updateData = this.isReviewer()
       ? this.statusFC.value
       : this.nameFC.value;
 
@@ -126,7 +124,7 @@ export class ViewOrEditComponent implements OnInit {
       return;
     }
 
-    const updateRequest = this.isReviewerUser
+    const updateRequest = this.isReviewer()
       ? this.documentService.updateDocumentStatus(documentId, updateData)
       : this.documentService.updateDocument(documentId, updateData);
 
@@ -135,7 +133,7 @@ export class ViewOrEditComponent implements OnInit {
     });
   }
 
-  handleDocumentAction(action: 'remove' | 'revoke') {
+  handleDocumentAction(action: 'remove' | 'revoke'): void {
     const messages = {
       remove: 'Are you sure you want to delete this document?',
       revoke: 'Are you sure you want to revoke this document?'

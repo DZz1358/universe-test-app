@@ -4,9 +4,9 @@ import { Router, RouterModule } from '@angular/router';
 import { StorageService } from '../../service/storage.service';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateDocumentComponent } from '../create-document/create-document.component';
-import { filter } from 'rxjs';
+import { filter, tap } from 'rxjs';
 import { DocumentsService } from '../../../service/documents.service';
-import { IUser } from '../../interfaces/interfaces';
+import { IDocumentResponse, IUser } from '../../interfaces/interfaces';
 import { UserService } from '../../service/user.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -53,10 +53,10 @@ export class HeaderComponent implements OnInit {
       })
       .afterClosed()
       .pipe(
-        filter((data: any) => !!data),
+        filter((data: IDocumentResponse) => !!data),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe((data) => {
+      .subscribe((data: IDocumentResponse) => {
         this.documentService.createDocument(data).subscribe(() => {
           window.location.reload();
         })

@@ -43,7 +43,7 @@ export class DashboardComponent implements AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  public dataSource = new MatTableDataSource([]);
+  public dataSource = new MatTableDataSource<IUser>([]);
   public displayedColumns = ['name', 'creator', 'status', 'updatedAt', 'settings']
   public resultsLength: number = 0;
   public paginatorPage: number = 0;
@@ -122,7 +122,7 @@ export class DashboardComponent implements AfterViewInit {
 
     this.documentsService.getDocuments(params)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((data: any) => {
+      .subscribe((data: IResponse) => {
         this.dataSource.data = data.results;
         this.paginatorPage = this.paginator.pageIndex;
         this.resultsLength = data.count;

@@ -36,3 +36,32 @@ export interface IDocument {
   status: string;
   updatedAt: string;
 }
+
+export interface IDocumentResponse {
+  file: FileMetadata;
+  name: string;
+  status: string;
+}
+
+export interface FileMetadata {
+  lastModified: number;
+  lastModifiedDate: Date;
+  name: string;
+  size: number;
+  type: string;
+  webkitRelativePath: string;
+}
+
+export interface GetDocumentsParams {
+  page?: string;
+  size?: string;
+}
+
+
+export interface DocumentRequestParams {
+  creatorEmail?: string;
+  creatorId?: string;
+  page?: number;
+  size?: number;
+  status?: string;
+}
