@@ -33,7 +33,6 @@ export class ViewOrEditComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
   private router = inject(Router);
   public statusesDocuments = signal(documentStatuses);
-  private documentId = signal<string>('');
   public document = signal<IDocument | null>(null);
   public currentUser = signal<IUser | null>(null);
 
@@ -49,9 +48,11 @@ export class ViewOrEditComponent implements OnInit {
     return this.currentUser()?.role === UserRole.REVIEWER;
   })
 
-  isFormInvalid(): boolean {
+  isFormInvalid = computed(() => {
     return this.isReviewer() ? this.statusFC.invalid : this.nameFC.invalid;
-  }
+  });
+
+  documentId = computed(() => this.activatedRoute.snapshot.paramMap.get('id') ?? '');
 
   public form: FormGroup = this.fb.group({
     name: ['', Validators.required],
@@ -61,11 +62,7 @@ export class ViewOrEditComponent implements OnInit {
   ngOnInit(): void {
     this.initStatuses();
     this.getUser();
-    this.activatedRoute.paramMap.subscribe((params) => {
-      const id = params.get('id') ?? '';
-      this.documentId.set(id);
-      if (this.documentId()) this.loadDocumentData();
-    });
+    if (this.documentId()) this.loadDocumentData();
   }
 
   getUser(): void {
